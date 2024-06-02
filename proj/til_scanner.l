@@ -78,6 +78,11 @@ EXP [Ee][+-]?[0-9]+
 "(read)"               return tREAD;
 "null"                 return tNULL;
 
+"with"                 return tWITH;
+"change"               return tCHANGE;
+"->"                   return tARROW;
+".."                   return tLIMITOR;
+
 "(program"             return tPROGRAM;
 
 [A-Za-z][A-Za-z0-9_]*  yylval.s = new std::string(yytext); return tIDENTIFIER;

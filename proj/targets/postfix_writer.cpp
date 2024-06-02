@@ -854,3 +854,38 @@ void til::postfix_writer::do_if_else_node(til::if_else_node * const node, int lv
   _visitedFinalInstruction = false; // in case it's not a block_node, but a single instruction
   _pf.LABEL(mklbl(lbl1 = lbl2));
 }
+void til::postfix_writer::do_with_change_node(til::with_change_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
+
+  _pf.ALIGN();
+  auto lineno = node->lineno();
+  std::string id = "_i";
+
+  auto start = new cdk::integer_node(lineno, dynamic_cast<cdk::integer_node *>(node->low())->value());
+  auto declaration = new til::declaration_node(
+    lineno, cdk::primitive_type::create(4, cdk::TYPE_INT), tPRIVATE, id, start
+  );
+  declaration->accept(this, lvl + 2);
+
+  auto variable = new cdk::variable_node(lineno, id);
+  auto rvalue = new cdk::rvalue_node(lineno, variable);
+
+  auto cpm = new cdk::lt_node(lineno, rvalue, node->high());
+
+  auto index = new til::index_node(lineno, node->vector(), rvalue);
+  auto element = new cdk::rvalue_node(lineno, index);
+
+  auto function_call = new til::function_call_node(lineno, node->function(), new cdk::sequence_node(lineno, element));
+
+  auto increment = new cdk::add_node(lineno, rvalue, new cdk::integer_node(lineno, 1));
+  auto assignment = new cdk::assignment_node(lineno, variable, increment);
+  auto evaluation = new til::evaluation_node(lineno, assignment);
+
+  auto loopBody = new cdk::sequence_node(lineno, function_call);
+  loopBody = new cdk::sequence_node(lineno, evaluation, loopBody);
+
+  auto loop = new til::loop_node(lineno, cpm, loopBody);
+
+  loop->accept(this, lvl + 2);
+
+}

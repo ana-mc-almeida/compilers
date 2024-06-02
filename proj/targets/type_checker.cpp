@@ -782,3 +782,42 @@ void til::type_checker::do_if_else_node(til::if_else_node *const node, int lvl) 
     throw std::string("wrong type in condition of if expression");
   }
 }
+
+void til::type_checker::do_with_change_node(til::with_change_node * const node, int lvl) {
+
+  node->function()->accept(this, lvl + 2);
+  if (!node->function()->is_typed(cdk::TYPE_FUNCTIONAL)) {
+    throw std::string("wrong type in with change call");
+  }
+
+  node->vector()->accept(this, lvl + 2);
+  if (!node->vector()->is_typed(cdk::TYPE_POINTER)) {
+    throw std::string("wrong type in with change call");
+  }
+
+  node->low()->accept(this, lvl + 2);
+  if (node->low()->is_typed(cdk::TYPE_UNSPEC)) {
+    node->low()->type(create_int());
+  }
+  else if (!node->low()->is_typed(cdk::TYPE_INT)) {
+    throw std::string("wrong type in with change call");
+  }
+
+  node->high()->accept(this, lvl + 2);
+  if (node->high()->is_typed(cdk::TYPE_UNSPEC)) {
+    node->high()->type(create_int());
+  }
+  else if (!node->high()->is_typed(cdk::TYPE_INT)) {
+    throw std::string("wrong type in with change call");
+  }
+
+  auto functionalType = cdk::functional_type::cast(node->function()->type());
+  if (functionalType->input()->length() != 1) {
+    throw std::string("wrong number of arguments in function call");
+  }
+  auto vectorType = cdk::reference_type::cast(node->vector()->type());
+  if (!deepTypeComparison(functionalType->input(0), vectorType->referenced(), true)) {
+    throw std::string("func argument does not match vector type");
+  }
+
+}
