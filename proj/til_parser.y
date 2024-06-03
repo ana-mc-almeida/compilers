@@ -46,6 +46,7 @@
 %token tREAD tFUNCTION tSET tSIZEOF tNULL tINDEX tOBJECTS// expressions
 %token tPROGRAM // program
 %token tGE tLE tEQ tNE tAND tOR // logical expressions 
+%token tUNLESS tITERATE tFOR tEXECUTE
 // TODO add missing tokens
 
 %nonassoc tIFX
@@ -154,6 +155,7 @@ instruction : expr                           { $$ = new til::evaluation_node(LIN
             | block                          { $$ = $1; } 
             | conditional_instruction        { $$ = $1; } 
             | tLOOP expr instruction ')'     { $$ = new til::loop_node(LINE, $2, $3); }
+            | '(' tUNLESS expr tITERATE expr tFOR expr tEXECUTE expr')' { $$ = new til::unless_iterate_node(LINE,$3,  $5, $7, $9); }
             ;
 
 conditional_instruction : tIF expr instruction ')' %prec tIFX    { $$ = new til::if_node(LINE, $2, $3); }

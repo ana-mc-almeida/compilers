@@ -366,3 +366,8 @@ void til::xml_writer::do_if_else_node(til::if_else_node * const node, int lvl) {
   closeTag("else", lvl + 2);
   closeTag(node, lvl);
 }
+
+
+void til::xml_writer::do_unless_iterate_node(til::unless_iterate_node * const node, int lvl) {
+  // EMPTY
+}

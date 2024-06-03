@@ -148,3 +148,6 @@ void til::frame_size_calculator::do_stop_node(til::stop_node * const node, int l
 void til::frame_size_calculator::do_sizeof_node(til::sizeof_node * const node, int lvl) {
   // EMPTY
 }
+void til::frame_size_calculator::do_unless_iterate_node(til::unless_iterate_node * const node, int lvl) {
+  // EMPTY
+}
